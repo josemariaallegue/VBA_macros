@@ -2,7 +2,9 @@ Attribute VB_Name = "Archivos"
 Option Explicit
 Option Private Module
 
-'abro un archivo y retorno el nombre y extension de mismo
+'resumen: devuelvo un archivo seleccionado a travez de una ventana
+'parametros: void
+'retorno: el archivo seleccionado
 Public Function obtenerArchivo() As Workbook
 
 Dim fd As Office.FileDialog
@@ -10,18 +12,18 @@ Dim fd As Office.FileDialog
 Set fd = Application.FileDialog(msoFileDialogOpen)
 
    With fd
-
+   
       .AllowMultiSelect = False
 
-      ' Set the title of the dialog box
-      .Title = "Please select the file."
+      'pongo un titulo a la venta
+      .Title = "Seleccione un archivo."
 
-      ' Clear out the current filters
+      'quito los filtros
       .Filters.Clear
 
-      ' Show the dialog box. If the .Show method returns True, the
-      ' user picked at least one file. If the .Show method returns
-      ' False, the user clicked Cancel
+      ' muestro la venta. Si .Show devuel verdadero, el
+      ' usuario eligio un archivo. Si devuelve
+      ' falso, el usuario selecciono cancelar
       If (.Show = True) Then
         
         'le otorgo a la variable de retorno el archivo que abrio
@@ -33,8 +35,9 @@ Set fd = Application.FileDialog(msoFileDialogOpen)
 
 End Function
 
-'retorna el nombre y extension de un archivo
-'recibe la ruta del archivo
+'resumen: recive una cadena con la ruta completa del archivo quita lo que esta de mas
+'parametros: una cade con la ruta del archivo
+'retorno: el nombre y la extencion del archivo
 Public Function nombreArchivo(ByVal ruta As String) As String
 
 Dim largoRuta, nombre As Long

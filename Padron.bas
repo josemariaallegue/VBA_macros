@@ -1,21 +1,26 @@
 Attribute VB_Name = "Padron"
 Option Explicit
 
+'resumen: revisa la muestra de padron enviada de sistemas
+'parametros: void
+'retorno: void
 Sub revision_muestra_padron()
 
 Call preparacionInicio
 
+'declaro las varibles
 Dim i, j, k, m As Integer
 Dim contador As Integer
 Dim codigos0a1, codigos1a2, codigos2a6, codigos6a9, codigosAdolescentes1, codigosAdolescentes2, codigosHombres, codigosMujeres As String
 Dim diagnosticosNoPermitidos As String
-Dim cuieColumna, nColumna, codigoPrestacionColumna, cantidadMuestraColumna, poblacionColumna, beneficiariosValidosColumna As Integer
+Dim cuieColumna, nColumna, codigoPrestacionColumna, cantidadMuestraColumna, poblacionColumna, beneficiariosValidosColumna, muestraColumna As Integer
 Dim fechaNacimientoColumna, fechaPrestacionColumna, provinciaColumna As Integer
 Dim cuieArray(), cantidadMuestraArray(), provinciaArray(), muestraArray(), n(), noElegiblesArray(), validosXcuie(), codigo, codigoIzquierda, diagnostico As String
 Dim edad As Double
 Dim auxiliar As Variant
 Dim flag As Boolean
 
+'asigno a las variables que contienen los codigos sus valores
 codigos0a1 = "CAW003A98;CTC001A97;CTC001H86;CTC020P07.0;CTC020P07.2;CTC021P07.0;CTC021P07.2;CTC021Q03;CTC021Q05;CTC021Q39.0;CTC021Q39.1;CTC021Q39.2;CTC021Q41;CTC021Q42;CTC021Q42.0;CTC021Q42.1;CTC021Q42.2;CTC021Q42.3;CTC021Q43.3;CTC021Q43.4;CTC021Q79.3;IGR005A98;IGR005L30;IGR025A98;IGR025L30;ITE013P07.0;ITE013P07.2;ITE014P07.0;ITE014P07.2;LBL001A98;LBL013A98;LBL035A98;LBL043A98;LBL115A98;LBL116A98;PRP017A46;PRP017A97;PRP021A97;PRP021H86;PRP022H86;TAT002A98;TAT003A98"
 codigos1a2 = "CAW003A98;CTC001A97;CTC001R78;CTC002R78;CTC010A97;IMV001A98;IMV005A98;IMV015A98;ITE001R78;TAT002A98;TAT003A98"
 codigos2a6 = "CAW003A98;CTC001A97;CTC001R78;CTC002R78;CTC010A97;CTC011A97;ITE001R78;TAT002A98;TAT003A98"
@@ -32,6 +37,7 @@ k = 1
 m = 0
 flag = False
 
+'redimenciono arrays
 ReDim cuieArray(1 To 12)
 ReDim cantidadMuestraArray(1 To 12)
 ReDim provinciaArray(1 To 12)
@@ -109,6 +115,14 @@ Do Until ActiveSheet.Cells(1, i).Value = ""
         
     End If
     
+    'guardo el valor de la columna de "MUESTRA", "MUESTRAS", "SELECCION" o "MUESTRA_VALIDO"
+    If (ActiveSheet.Cells(1, i).Value = "MUESTRA" Or ActiveSheet.Cells(1, i).Value = "MUESTRAS" _
+    Or ActiveSheet.Cells(1, i).Value = "SELECCION" Or ActiveSheet.Cells(1, i).Value = "MUESTRA_VALIDO") Then
+    
+        muestraColumna = i
+        
+    End If
+    
     
     
     i = i + 1
@@ -118,13 +132,16 @@ Loop
 'recorrido vertical
 Do Until ActiveSheet.Cells(j, 1).Value = ""
     
-    'otorgo valor del codigo, primeros 6 caracteres del codigo y el diagnostico a 3 variables
+    'otorgo valor del codigo, primeros 6 caracteres del codigo, el diagnostico y la edad
     codigo = UCase(ActiveSheet.Cells(j, codigoPrestacionColumna).Value)
     codigoIzquierda = Left(codigo, 6)
     diagnostico = Right(codigo, 3)
+    edad = (ActiveSheet.Cells(j, fechaPrestacionColumna).Value - ActiveSheet.Cells(j, fechaNacimientoColumna).Value) / 365
     
-    'guardo la muestraArray para cada cuie
-    'en el contador se guardan la cantidad de efectores tomados
+    'entra al if cuando entre dos filas cambia el cuie
+    'guardo los cuie en cuieArray, la cantidad de muestra determinada por los calculos en cantidadMuestraArray
+    'el id de la provincia en provinciaArray, la n para cada una de las provincias en n y la cantidad de casos
+    'validos por cuie en validosXcuie
     If (ActiveSheet.Cells(j, cuieColumna).Value <> ActiveSheet.Cells(j - 1, cuieColumna).Value) Then
         
         If (largoArray(cuieArray) = k) Then
@@ -144,13 +161,20 @@ Do Until ActiveSheet.Cells(j, 1).Value = ""
         provinciaArray(k) = ActiveSheet.Cells(j, provinciaColumna).Value
         n(k) = ActiveSheet.Cells(j, nColumna).Value
         validosXcuie(k) = ActiveSheet.Cells(j, beneficiariosValidosColumna).Value
-
+        
+        'el flag esta para poder cambiar la posicion en el array muestraArray
         k = k + 1
         flag = False
 
     End If
     
-    If (LCase(ActiveSheet.Cells(j, cuieColumna).Value) = LCase(ActiveSheet.Cells(j - 1, cuieColumna).Value)) Then
+    'entra cuando la columan de MUESTRA es x y cuando el cuie de la fila actual es igual al del anterior
+    'cuento la cantidad de casos que tienen x
+    'si no esta la columna "MUESTRA", "MUESTRAS" o "SELECCION" el On Error obliga a que se cumpla la condicion
+    'y cuenta todos los casos del archivo
+    On Error GoTo sinColumnaMuestra
+    If (muestraColumna <> 0 And LCase(ActiveSheet.Cells(j, muestraColumna).Value) = "x" And _
+    LCase(ActiveSheet.Cells(j, cuieColumna).Value) = LCase(ActiveSheet.Cells(j - 1, cuieColumna).Value)) Then
         
         If (largoArray(muestraArray) = m) Then
             
@@ -159,123 +183,131 @@ Do Until ActiveSheet.Cells(j, 1).Value = ""
         End If
         
         If (flag = False) Then
-            
+
             m = m + 1
-            muestraArray(m) = muestraArray(m) + 1
+'            muestraArray(m) = muestraArray(m) + 1
             flag = True
-            
+
         End If
-        
+
         muestraArray(m) = muestraArray(m) + 1
         
-    End If
     
-    'reviso que los codigos seleccionados sean los del listado de codigos elegibles
-    'pinto la celda del codigo invalido
-    'cuento la cantidad de codigos invalidos en contador
-    Select Case ActiveSheet.Cells(j, poblacionColumna).Value
+            If (edad >= 20 And edad < 65 And ActiveSheet.Cells(j, poblacionColumna).Value = "Mujeres 20-64") Then
 
-        Case "Mujeres 20-64"
+                If (InStr(1, codigosMujeres, codigo) = 0) Then
 
-            If (InStr(1, codigosMujeres, codigo) = 0) Then
+                    ActiveSheet.Cells(j, codigoPrestacionColumna).Interior.Color = RGB(255, 255, 0)
+                    contador = contador + 1
+                    noElegiblesArray(k) = noElegiblesArray(k) + 1
 
-                ActiveSheet.Cells(j, codigoPrestacionColumna).Interior.Color = RGB(255, 255, 0)
-                contador = contador + 1
-                noElegiblesArray(k) = noElegiblesArray(k) + 1
+                End If
 
-            End If
+            ElseIf (edad >= 20 And edad < 65 And ActiveSheet.Cells(j, poblacionColumna).Value = "Hombres 20-64") Then
 
-        Case "Hombres 20-64"
+                If (InStr(1, codigosHombres, codigo) = 0) Then
 
-            If (InStr(1, codigosHombres, codigo) = 0) Then
+                    ActiveSheet.Cells(j, codigoPrestacionColumna).Interior.Color = RGB(255, 255, 0)
+                    contador = contador + 1
+                    noElegiblesArray(k) = noElegiblesArray(k) + 1
 
-                ActiveSheet.Cells(j, codigoPrestacionColumna).Interior.Color = RGB(255, 255, 0)
-                contador = contador + 1
-                noElegiblesArray(k) = noElegiblesArray(k) + 1
+                 End If
 
-            End If
+            ElseIf (edad >= 6 And edad < 10) Then
 
-        Case "Niños 6-9"
+                If (InStr(1, codigos6a9, codigo) = 0) Then
 
-            If (InStr(1, codigos6a9, codigo) = 0) Then
+                    ActiveSheet.Cells(j, codigoPrestacionColumna).Interior.Color = RGB(255, 255, 0)
+                    contador = contador + 1
+                    noElegiblesArray(k) = noElegiblesArray(k) + 1
 
-                ActiveSheet.Cells(j, codigoPrestacionColumna).Interior.Color = RGB(255, 255, 0)
-                contador = contador + 1
-                noElegiblesArray(k) = noElegiblesArray(k) + 1
+                End If
 
-            End If
+            ElseIf (edad >= 10 And edad < 20) Then
 
-        Case "Adolecentes 10-19"
-
-            If ((InStr(1, codigosAdolescentes1, codigo) = 0) _
-            And (InStr(1, codigosAdolescentes2, codigo) = 0)) Then
-
-                If ((InStr(1, codigosAdolescentes1, codigoIzquierda) <> 0) _
-                Or (InStr(1, codigosAdolescentes2, codigoIzquierda) <> 0)) Then
-
-                    If (InStr(1, diagnosticosNoPermitidos, diagnostico) <> 0) Then
-
+                If ((InStr(1, codigosAdolescentes1, codigo) = 0) _
+                And (InStr(1, codigosAdolescentes2, codigo) = 0)) Then
+    
+                    If ((InStr(1, codigosAdolescentes1, codigoIzquierda) <> 0) _
+                    Or (InStr(1, codigosAdolescentes2, codigoIzquierda) <> 0)) Then
+    
+                        If (InStr(1, diagnosticosNoPermitidos, diagnostico) <> 0) Then
+    
+                            ActiveSheet.Cells(j, codigoPrestacionColumna).Interior.Color = RGB(255, 255, 0)
+                            contador = contador + 1
+                            noElegiblesArray(k) = noElegiblesArray(k) + 1
+    
+                        End If
+    
+                    Else
+    
                         ActiveSheet.Cells(j, codigoPrestacionColumna).Interior.Color = RGB(255, 255, 0)
                         contador = contador + 1
                         noElegiblesArray(k) = noElegiblesArray(k) + 1
-
+    
                     End If
-
-                Else
-
-                    ActiveSheet.Cells(j, codigoPrestacionColumna).Interior.Color = RGB(255, 255, 0)
-                    contador = contador + 1
-                    noElegiblesArray(k) = noElegiblesArray(k) + 1
-
+    
                 End If
-
-            End If
-
-        Case "Niños 0-5"
-
-            'cargo la siguiente variable para reducir escritura
-            edad = (ActiveSheet.Cells(j, fechaPrestacionColumna).Value - ActiveSheet.Cells(j, fechaNacimientoColumna).Value) / 365
-
-            If (edad >= 0 And edad < 1) Then
-
-                If (InStr(1, codigos0a1, codigo) = 0) Then
-
-                    ActiveSheet.Cells(j, codigoPrestacionColumna).Interior.Color = RGB(255, 255, 0)
-                    contador = contador + 1
-                    noElegiblesArray(k) = noElegiblesArray(k) + 1
-
+    
+            ElseIf (edad >= 0 And edad < 6) Then
+    
+                
+    
+                If (edad >= 0 And edad < 1) Then
+    
+                    If (InStr(1, codigos0a1, codigo) = 0) Then
+    
+                        ActiveSheet.Cells(j, codigoPrestacionColumna).Interior.Color = RGB(255, 255, 0)
+                        contador = contador + 1
+                        noElegiblesArray(k) = noElegiblesArray(k) + 1
+    
+                    End If
+    
+                ElseIf (edad >= 1 And edad < 2) Then
+    
+                    If (InStr(1, codigos1a2, codigo) = 0) Then
+    
+                        ActiveSheet.Cells(j, codigoPrestacionColumna).Interior.Color = RGB(255, 255, 0)
+                        contador = contador + 1
+                        noElegiblesArray(k) = noElegiblesArray(k) + 1
+    
+                    End If
+    
+                ElseIf (edad >= 2) Then
+    
+                    If (InStr(1, codigos2a6, codigo) = 0) Then
+    
+                        ActiveSheet.Cells(j, codigoPrestacionColumna).Interior.Color = RGB(255, 255, 0)
+                        contador = contador + 1
+                        noElegiblesArray(k) = noElegiblesArray(k) + 1
+    
+                    End If
+    
                 End If
+    
+        End If
 
-            ElseIf (edad >= 1 And edad < 2) Then
-
-                If (InStr(1, codigos1a2, codigo) = 0) Then
-
-                    ActiveSheet.Cells(j, codigoPrestacionColumna).Interior.Color = RGB(255, 255, 0)
-                    contador = contador + 1
-                    noElegiblesArray(k) = noElegiblesArray(k) + 1
-
-                End If
-
-            Else
-
-                If (InStr(1, codigos2a6, codigo) = 0) Then
-
-                    ActiveSheet.Cells(j, codigoPrestacionColumna).Interior.Color = RGB(255, 255, 0)
-                    contador = contador + 1
-                    noElegiblesArray(k) = noElegiblesArray(k) + 1
-
-                End If
-
-            End If
-
-    End Select
+    End If
+    
+    'reviso que los codigos seleccionados sean los del listado de codigos elegibles
+    'o que el diagnosticoi no sea invalido (solo para adolescentes)
+    'pinto la celda del codigo invalido
+    'cuento la cantidad de codigos invalidos en el array noElegiblesArray
+    
     
     j = j + 1
     
 Loop
 
-Call cuadrosMuestraPadron(cuieArray, cantidadMuestraArray, provinciaArray, muestraArray, n, noElegiblesArray, validosXcuie, contador)
+'excepcion por si no esta la columna "Muestra
+sinColumnaMuestra:
 
+muestraColumna = 0
+
+Resume Next
+
+'se arma el resumen con los datos obtenidos
+Call cuadrosMuestraPadron(cuieArray, cantidadMuestraArray, provinciaArray, muestraArray, n, noElegiblesArray, validosXcuie, contador)
 Call preparacionFinal
 
 End Sub

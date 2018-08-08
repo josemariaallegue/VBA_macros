@@ -1,127 +1,233 @@
 Attribute VB_Name = "Módulo1"
 Option Explicit
 
-Sub revision_muestra()
+Private Sub analisisDatosReportables()
 
-Dim i, j, k, l As Integer
-Dim CUIE_COLUMNA, N, CODIGO_PRESTACION, CANTIDAD_MUESTRA(1 To 12) As Integer
-Dim CUIE(1 To 12), mensaje, codigos As String
-Dim contador1, contador2, contador3 As Integer
+Call preparacionInicio
+
+Dim i, j, k, fila As Integer
+Dim edad As Double
+Dim beneficiario1 As New Beneficiario
+Dim coll As New Collection
+
+
+Call columnas(coll)
+
+For fila = 2 To filaMaxActiva(columnaMaxActiva)
+    
+    beneficiario1 = Nothing
+    beneficiario1.Init coll, fila
+    
+    
+Next fila
+
+End Sub
+
+Sub columnas(ByRef coll As Collection)
+
+Dim i, j, k As Integer
+Dim nombreColumna As String
+Dim celda As Variant
 
 i = 1
-j = 2
-k = 1
-l = 2
-codigos = "APA001A98;APA001W78;APA001X75;APA001X86;APA002X75;APA002X76;APA002X80;APA002A98;CTC001A97;CTC001B80;CTC001D11;CTC001R74;CTC001R78;CTC001T91;CTC002A97;CTC002R96;CTC002T82;CTC002T91;CTC005B80;CTC005W78;CTC006W78;CTC007W84;CTC008A97;CTC010A97;CTC010W78;CTC011A97;CTC012A03;CTC012A81;CTC012A92;CTC012D01;CTC012D10;CTC012H71;CTC012H72;CTC012H76;CTC012L72;CTC012L73;CTC012L74;CTC012L77;CTC012L78;CTC012L80;CTC012R72;CTC012R77;CTC012R80;CTC012S13;CTC012T11;IMV001A98;IMV002A98;IMV003A98;IMV004A98;IMV005A98;IMV006A98;IMV007A98;IMV013A98;IMV014A98;ITE002A40;ITE002A41;ITE002A42;ITE002A44;ITE002R78;ITQ001W90;ITQ001W91;ITQ002W88;ITQ002W89;ITQ005W06;ITQ006W07;ITQ007W08;TAT001A98;TAT002A98;TAT003A98;TAT007A98;TAT008A98;TAT009A98;TAT010A98;TAT013A98;TAT014A98;CTC001T79;CTC001R96;CTC001R81"
-contador2 = 0
 
+Worksheets("Database").Activate
 
-'recorrido horizontal de las columnas
-Do Until ActiveSheet.Cells(1, i).Value = ""
+For Each celda In ActiveSheet.Range("A1:CA1")
 
-    'guardo el valor de la columna de "CUIE"
-    If (ActiveSheet.Cells(1, i).Value = "CUIE_EFECTOR") Then
+    nombreColumna = celda.Value
+    
+    If (nombreColumna = "NOMBRE_BENEFICIARIO") Then
         
-        CUIE_COLUMNA = i
+        coll.Add celda.Column, "NOMBRE_BENEFICIARIO"
+    
+    ElseIf (nombreColumna = "APELLIDO_BENEFICIARIO") Then
+        
+        coll.Add celda.Column, "APELLIDO_BENEFICIARIO"
+    
+    ElseIf (nombreColumna = "FECHA_PRESTACION") Then
+        
+        coll.Add celda.Column, "FECHA_PRESTACION"
+    
+    ElseIf (nombreColumna = "FECHA_DE_NACIMIENTO") Then
+        
+        coll.Add celda.Column, "FECHA_DE_NACIMIENTO"
+
+    ElseIf (nombreColumna = "CLAVE_BENEFICIARIO") Then
+        
+        coll.Add celda.Column, "CLAVE_BENEFICIARIO"
+
+    ElseIf (nombreColumna = "TIPO_DOC") Then
+        
+        coll.Add celda.Column, "TIPO_DOC"
+        
+    ElseIf (nombreColumna = "BENEF_NRO_DOCUMENTO") Then
+        
+        coll.Add celda.Column, "BENEF_NRO_DOCUMENTO"
+    
+    ElseIf (nombreColumna = "SEXO") Then
+        
+        coll.Add celda.Column, "SEXO"
+    
+    ElseIf (nombreColumna = "CODIGO_PRESTACION") Then
+        
+        coll.Add celda.Column, "CODIGO_PRESTACION"
+    
+    ElseIf (nombreColumna = "PESO") Then
+        
+        coll.Add celda.Column, "PESO"
+        
+    ElseIf (nombreColumna = "TALLA") Then
+    
+        coll.Add celda.Column, "TALLA"
+    
+    ElseIf (nombreColumna = "TENSION_ARTERIAL") Then
+
+        coll.Add celda.Column, "TENSION_ARTERIAL"
+    
+    ElseIf (nombreColumna = "PERIMETRO_CEFALICO") Then
+
+        coll.Add celda.Column, "PERIMETRO_CEFALICO"
+    
+    ElseIf (nombreColumna = "SEMANAS_EMBARAZO") Then
+
+        coll.Add celda.Column, "SEMANAS_EMBARAZO"
+    
+    ElseIf (nombreColumna = "INDICE_ODONTO") Then
+
+        coll.Add celda.Column, "INDICE_ODONTO"
+    
+    ElseIf (nombreColumna = "RESULTADO_OTO") Then
+
+        coll.Add celda.Column, "RESULTADO_OTO"
+    
+    ElseIf (nombreColumna = "RESULTADO_RETINO") Then
+
+        coll.Add celda.Column, "RESULTADO_RETINO"
+    
+    ElseIf (nombreColumna = "BIOPSIA_MAMA") Then
+
+        coll.Add celda.Column, "BIOPSIA_MAMA"
+    
+    ElseIf (nombreColumna = "BIOPSIA_CERVICO") Then
+
+        coll.Add celda.Column, "BIOPSIA_CERVICO"
+    
+    ElseIf (nombreColumna = "LECTURA_PAP") Then
+
+        coll.Add celda.Column, "LECTURA_PAP"
+        
+    ElseIf (nombreColumna = "MAMOGRAFIA") Then
+
+        coll.Add celda.Column, "MAMOGRAFIA"
+        
+    ElseIf (nombreColumna = "VDRL") Then
+
+        coll.Add celda.Column, "VDRL"
+        
+    ElseIf (nombreColumna = "TRAT_INSTAURADO") Then
+
+        coll.Add celda.Column, "TRAT_INSTAURADO"
         
     End If
-    
-    'guardo el valor de la columna de "CODIGO_PRESTACION"
-    If (ActiveSheet.Cells(1, i).Value = "CODIGO_PRESTACION") Then
-    
-        CODIGO_PRESTACION = i
-        
-    End If
-    
-    'guardo el valor de "N"
-    If (ActiveSheet.Cells(1, i).Value = "N") Then
-    
-        N = ActiveSheet.Cells(2, i).Value
-        
-    End If
-    
-    'guardo la muestra para cada CUIE
-    If (ActiveSheet.Cells(1, i).Value = "CANTIDAD_MUESTRA") Then
-    
-        Do Until ActiveSheet.Cells(j, i).Value = ""
-            
-            If (ActiveSheet.Cells(j, i).Value <> ActiveSheet.Cells(j - 1, i).Value) Then
 
-                CUIE(k) = ActiveSheet.Cells(j, CUIE_COLUMNA).Value
-                CANTIDAD_MUESTRA(k) = ActiveSheet.Cells(j, i).Value
+Next celda
 
-                k = k + 1
 
-            End If
-            
-            'reviso que los codigos seleccionados sean los del listado de codigos elegibles
-            If (InStr(1, codigos, ActiveSheet.Cells(j, CODIGO_PRESTACION).Value) = 0) Then
-            
-                ActiveSheet.Cells(j, CODIGO_PRESTACION).Interior.Color = RGB(255, 255, 0)
-                contador2 = contador2 + 1
-                
-            End If
-            
-            j = j + 1
-            
-        Loop
-        
-    End If
+'Do Until (ActiveSheet.Cells(1, i).Value = "")
+'
+'    nombreColumna = ActiveSheet.Cells(1, i).Value
+'
+'
+'    If (nombreColumna = "APELLIDO_BENEFICIARIO") Then
+'
+'        coll.Add i, "APELLIDO_BENEFICIARIO"
+'
+'    ElseIf (nombreColumna = "FECHA_PRESTACION") Then
+'
+'        coll.Add i, "FECHA_PRESTACION"
+'
+'    ElseIf (nombreColumna = "FECHA_DE_NACIMIENTO") Then
+'
+'        coll.Add i, "FECHA_DE_NACIMIENTO"
+'
+'    ElseIf (nombreColumna = "CLAVE_BENEFICIARIO") Then
+'
+'        coll.Add i, "CLAVE_BENEFICIARIO"
+'
+'    ElseIf (nombreColumna = "TIPO_DOC") Then
+'
+'        coll.Add i, "TIPO_DOC"
+'
+'    ElseIf (nombreColumna = "SEXO") Then
+'
+'        coll.Add i, "SEXO"
+'
+'    ElseIf (nombreColumna = "CODIGO_PRESTACION") Then
+'
+'        coll.Add i, "CODIGO_PRESTACION"
+'
+'    ElseIf (nombreColumna = "PESO") Then
+'
+'        coll.Add i, "PESO"
+'
+'    ElseIf (nombreColumna = "TALLA") Then
+'
+'        coll.Add i, "TALLA"
+'
+'    ElseIf (nombreColumna = "TENSION_ARTERIAL") Then
+'
+'        coll.Add i, "TENSION_ARTERIAL"
+'
+'    ElseIf (nombreColumna = "PERIMETRO_CEFALICO") Then
+'
+'        coll.Add i, "PERIMETRO_CEFALICO"
+'
+'    ElseIf (nombreColumna = "SEMANAS_EMBARAZO") Then
+'
+'        coll.Add i, "SEMANAS_EMBARAZO"
+'
+'    ElseIf (nombreColumna = "INDICE_ODONTO") Then
+'
+'        coll.Add i, "INDICE_ODONTO"
+'
+'    ElseIf (nombreColumna = "RESULTADO_OTO") Then
+'
+'        coll.Add i, "RESULTADO_OTO"
+'
+'    ElseIf (nombreColumna = "RESULTADO_RETINO") Then
+'
+'        coll.Add i, "RESULTADO_RETINO"
+'
+'    ElseIf (nombreColumna = "BIOPSIA_MAMA") Then
+'
+'        coll.Add i, "BIOPSIA_MAMA"
+'
+'    ElseIf (nombreColumna = "BIOPSIA_CERVICO") Then
+'
+'        coll.Add i, "BIOPSIA_CERVICO"
+'
+'    ElseIf (nombreColumna = "LECTURA_PAP") Then
+'
+'        coll.Add i, "LECTURA_PAP"
+'
+'    ElseIf (nombreColumna = "MAMOGRAFIA") Then
+'
+'        coll.Add i, "MAMOGRAFIA"
+'
+'    ElseIf (nombreColumna = "VDRL") Then
+'
+'        coll.Add i, "VDRL"
+'
+'    ElseIf (nombreColumna = "TRAT_INSTAURADO") Then
+'
+'        coll.Add i, "TRAT_INSTAURADO"
+'
+'    End If
+'
+'
+'    i = i + 1
+'
+'Loop
 
-    i = i + 1
-    
-Loop
-
-Do Until ActiveSheet.Cells(l, 1).Value = ""
-
-    contador1 = contador1 + 1
-    l = l + 1
-
-Loop
-
-If (contador1 <> N) Then
-
-    mensaje = "El valor de la N es: " & N & " pero hay: " & contador1 & " por lo que hay " & (N - contador1) & " casos de menos." & vbCrLf
-    mensaje = mensaje & "De estos " & contador1 & " casos " & contador2 & " es/son codigos no elegibles." & vbCrLf
-
-End If
-
-MsgBox mensaje
 End Sub
-
-Sub concatenar()
-
-Dim i As Integer
-Dim j As Integer
-Dim texto As String
-
-i = 1
-j = 1
-
-Do Until ActiveSheet.Cells(j, i).Value = ""
-
-    texto = texto & ";" & ActiveSheet.Cells(j, i).Value
-    j = j & 1
-
-Loop
-
-ActiveSheet.Cells(2, 2).Value = texto
-
-End Sub
-
-Sub instr()
-
-Dim texto As String
-
-texto = "APA001A98;APA001W78;APA001X75;APA001X86;APA002X75;APA002X76;APA002X80;APA002A98;CTC001A97;CTC001B80;CTC001D11;CTC001R74;CTC001R78;CTC001T91;CTC002A97;CTC002R96;CTC002T82;CTC002T91;CTC005B80;CTC005W78;CTC006W78;CTC007W84;CTC008A97;CTC010A97;CTC010W78;CTC011A97;CTC012A03;CTC012A81;CTC012A92;CTC012D01;CTC012D10;CTC012H71;CTC012H72;CTC012H76;CTC012L72;CTC012L73;CTC012L74;CTC012L77;CTC012L78;CTC012L80;CTC012R72;CTC012R77;CTC012R80;CTC012S13;CTC012T11;IMV001A98;IMV002A98;IMV003A98;IMV004A98;IMV005A98;IMV006A98;IMV007A98;IMV013A98;IMV014A98;ITE002A40;ITE002A41;ITE002A42;ITE002A44;ITE002R78;ITQ001W90;ITQ001W91;ITQ002W88;ITQ002W89;ITQ005W06;ITQ006W07;ITQ007W08;TAT001A98;TAT002A98;TAT003A98;TAT007A98;TAT008A98;TAT009A98;TAT010A98;TAT013A98;TAT014A98;CTC001T79;CTC001R96;CTC001R81"
-
-If (InStr(1, texto, "CTC001A99") = 0) Then
-
-    MsgBox "entro"
-
-End If
-
-MsgBox "final"
-End Sub
-
-
