@@ -14,7 +14,7 @@ End Function
 'resumen: muestra los elementos de un array unidimensional por consola
 'parametro: un array
 'retorno: void
-Public Sub MostrarArray(ByVal arr As Variant)
+Public Function MostrarArray(ByVal arr As Variant)
     
     Dim i As Integer
     Dim auxiliar As Variant
@@ -25,14 +25,14 @@ Public Sub MostrarArray(ByVal arr As Variant)
         
     Next i
     
-    Exit Sub
+    Exit Function
     
-End Sub
+End Function
 
 'resumen: muestra los elementos de un matriz de 2 dimensiones por consola
 'parametro: una matriz
 'retorno: void
-Sub MostrarMatriz(ByVal arr As Variant)
+Public Function MostrarMatriz(ByVal arr As Variant)
     
     Dim i, j As Integer
     Dim auxiliar As Variant
@@ -47,12 +47,12 @@ Sub MostrarMatriz(ByVal arr As Variant)
         
     Next i
     
-End Sub
+End Function
 
 'resumen: ordena una coleccion
 'parametro: la coleccion a ordenar por referencia, zaraza1, zaraza2
 'retorno: void
-Sub QuickSort(coll As Collection, first As Long, last As Long)
+Public Function QuickSort(coll As Collection, first As Long, last As Long)
   
   Dim vCentreVal As Variant, vTemp As Variant
   
@@ -94,4 +94,4 @@ Sub QuickSort(coll As Collection, first As Long, last As Long)
   If first < lTempHi Then QuickSort coll, first, lTempHi
   If lTempLow < last Then QuickSort coll, lTempLow, last
   
-End Sub
+End Function

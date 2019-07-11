@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} usfmCompararRegistros 
    Caption         =   "Comparar cantidad registros"
-   ClientHeight    =   2475
+   ClientHeight    =   1980
    ClientLeft      =   45
    ClientTop       =   390
-   ClientWidth     =   6675
+   ClientWidth     =   6495
    OleObjectBlob   =   "usfmCompararRegistros.frx":0000
    StartUpPosition =   1  'Centrar en propietario
 End
@@ -16,6 +16,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Sub btnContinuar_Click()
+
 Dim i, j, columnaHoja1, filas As Long
 Dim registrosHoja1, registrosHoja2 As Double
 Dim rango1, rango2 As Range
@@ -26,7 +27,7 @@ Dim auxHora As Date
 'preparo el archivo
 Call preparacionInicio
 
-''otorgo valores a varias varibales
+'otorgo valores a varias varibales
 auxHora = Now
 Set hoja1 = ActiveWorkbook.Sheets(usfmCompararRegistros.cmbxHoja1.Text)
 Set hoja2 = ActiveWorkbook.Sheets(usfmCompararRegistros.cmbxHoja2.Text)
@@ -57,11 +58,12 @@ For i = 1 To columnaHoja1
     Next j
 
     'otorgo valores a distintas variables
+    'a registrosHoja1 y registrosHoja2 se les resta 1 porque si no cuentra el encabezado de la columna
     On Error Resume Next
     Set rango1 = hoja1.Range(hoja1.Cells(1, i), hoja1.Cells(filas, i))
     Set rango2 = hoja2.Range(hoja2.Cells(1, i), hoja2.Cells(filas, i))
-    registrosHoja1 = rango1.Cells.SpecialCells(xlCellTypeConstants).Count
-    registrosHoja2 = rango2.Cells.SpecialCells(xlCellTypeConstants).Count
+    registrosHoja1 = rango1.Cells.SpecialCells(xlCellTypeConstants).Count - 1
+    registrosHoja2 = rango2.Cells.SpecialCells(xlCellTypeConstants).Count - 1
 
     'completo los valores de la variable "resumen" para asi armar la solapa "Resumen"
     resumen(i, 1) = hoja1.Cells(1, i).Value
@@ -74,6 +76,10 @@ Next i
 'llamo a la funcion cuadrosComparacionCantidadRegistros y vuelvo a preparar el archivo
 Call cuadrosComparacionCantidadRegistros(hoja1, hoja2, resumen, columnaHoja1)
 Call preparacionFinal
+
+End Sub
+
+Private Sub cmbxHoja1_Change()
 
 End Sub
 
